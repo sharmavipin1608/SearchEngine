@@ -48,8 +48,13 @@ public class PorterStemmer {
 
     public static void main(String[] args) {
         //use for testing
-        processToken("university");
-        processToken("universe");
+        System.out.println(processToken("rational"));
+//        processToken("universe");
+        
+//        String term = "what 'the' fuck";
+//        Pattern p = Pattern.compile("([\'])(\\1)");
+//        if(p.matcher(term).find())
+//            System.out.println("done");
     }
 
     public static String processToken(String token) {

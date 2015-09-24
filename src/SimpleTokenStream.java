@@ -40,7 +40,15 @@ public class SimpleTokenStream implements TokenStream {
       if (!hasNextToken())
          return null;
       
-      String next = mReader.next().replaceAll("\\W", "").toLowerCase();
+      //it was replacing all the special characters whereas we just want to 
+      //remove special characters from the start and the end of the file
+      
+      String next = mReader.next();
+      next = next.replaceAll("-", "hyphen");
+      next = next.replaceAll("\\W", "");
+      next = next.replaceAll("hyphen","-");
+      next = next.toLowerCase();
+      //String next = mReader.next().toLowerCase();
       return next.length() > 0 ? next : 
        hasNextToken() ? nextToken() : null;
    }
