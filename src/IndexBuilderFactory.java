@@ -6,7 +6,9 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.SimpleFileVisitor;
 import java.nio.file.attribute.BasicFileAttributes;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Calendar;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Scanner;
@@ -28,7 +30,9 @@ public class IndexBuilderFactory {
     private List<String> fileNames = new ArrayList<String>();
     
     private IndexBuilderFactory( Path currentWorkingPath ){
-        
+        Calendar cal = Calendar.getInstance();
+        SimpleDateFormat sdf = new SimpleDateFormat("HH:mm:ss");
+        System.out.println( sdf.format(cal.getTime()) );
         // This is our standard "walk through all .txt files" code.
         try{
             Files.walkFileTree(currentWorkingPath, new SimpleFileVisitor<Path>() {
@@ -36,6 +40,7 @@ public class IndexBuilderFactory {
 
                 public FileVisitResult preVisitDirectory(Path dir,
                         BasicFileAttributes attrs) {
+                    //System.out.println("pre-visit");
                     // make sure we only process the current working directory
                     if (currentWorkingPath.equals(dir)) {
                         return FileVisitResult.CONTINUE;
@@ -45,10 +50,13 @@ public class IndexBuilderFactory {
 
                 public FileVisitResult visitFile(Path file,
                         BasicFileAttributes attrs) {
+                    //System.out.println("visit file");
                     // only process .txt files
                     if (file.toString().endsWith(".txt")) {
                    // we have found a .txt file; add its name to the fileName list,
                         // then index the file and increase the document ID counter.
+                        if(file.getFileName().toString().contains("article1e92.txt"))
+                            //System.out.println("here");
                         System.out.println("Indexing file " + file.getFileName());
 
                         fileNames.add(file.getFileName().toString());
@@ -64,12 +72,40 @@ public class IndexBuilderFactory {
 
                     return FileVisitResult.CONTINUE;
                 }
+                
+                //call this method to calculate the indices
+                //make the call asynchronous 
+                public FileVisitResult postVisitDirectory(Path dir,
+                                                      IOException exc) {
+                    //System.out.println("Directory: " + dir);
+                    new Thread(new Runnable() {
+
+                        @Override
+                        public void run() {
+                            try{
+                                Thread.sleep(10);
+                                posIndex.calculateMetrics();
+                            }
+                            catch(Exception ex){
+                                System.out.println("sleeping");
+                            }
+                        }
+                        
+                    }).start();
+                    
+                    
+                    return FileVisitResult.CONTINUE;
+                }
 
             });
         }
         catch(IOException ex){
             System.out.println("Exception : " + ex.getMessage());
         }
+        
+        Calendar cal1 = Calendar.getInstance();
+        SimpleDateFormat sdf1 = new SimpleDateFormat("HH:mm:ss");
+        System.out.println( sdf1.format(cal1.getTime()) );
     }
     
     public static IndexBuilderFactory getInstance(){
@@ -109,11 +145,13 @@ public class IndexBuilderFactory {
     private static void indexFile(File file, int docID) {
         // Construct a SimpleTokenStream for the given File.
         // Read each token from the stream and add it to the index.
+        int count = 1;
+        String term = null;    
         try {
             SimpleTokenStream tokenStream = new SimpleTokenStream(file);
-            int count = 1;
+            //int count = 1;
             while (tokenStream.hasNextToken()) {
-                String term = tokenStream.nextToken();
+                term = tokenStream.nextToken();
                 //hyphenation
                 if(term.contains("-")){
                     String[] multipleTerms = term.split("-");
@@ -146,6 +184,7 @@ public class IndexBuilderFactory {
     }
     
     private static void stemAndAddToIndex(String term, int docId, int position){
+        posIndex.addType(term);
         term = PorterStemmer.processToken(term);
         //index.addTerm(term, docId);
         posIndex.addTerm(term, docId, position);

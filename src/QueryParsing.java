@@ -29,10 +29,12 @@ public class QueryParsing {
     public static void main(String[] args){
         
         
-        final Path currentWorkingPath = Paths.get("").toAbsolutePath();
+        final Path currentWorkingPath = Paths.get("/Users/vipinsharma/NetBeansProjects/SearchEngineAssignment2/angels").toAbsolutePath();
         
+        //final Path currentWorkingPath = Paths.get("").toAbsolutePath();
+        System.out.println("Current working path  : " + currentWorkingPath);
         IndexBuilderFactory.createIndex(currentWorkingPath);
-        IndexBuilderFactory.getInstance().getPositionalIndex().printResults();
+        //System.out.println("Stats pre : " + IndexBuilderFactory.getInstance().getPositionalIndex().getCount());
         
         while(true){
             System.out.print("Search phrase : ");
@@ -42,6 +44,11 @@ public class QueryParsing {
 
             if(userInput.equalsIgnoreCase("quit"))
                 break;
+            else if(userInput.equalsIgnoreCase("stats")){
+                //System.out.println("Stats : " + IndexBuilderFactory.getInstance().getPositionalIndex().getCount());
+                IndexBuilderFactory.getInstance().getPositionalIndex().printMetrics();
+                continue;
+            }
             HashSet<Integer> resultSet = IndexBuilderFactory.getInstance().queryProcessing(userInput);
 
             System.out.println("Query result documents : ");
