@@ -1,6 +1,11 @@
+package com.java.searchengine.main;
+
 
 import java.util.regex.*;
 
+/**
+ * Stems the terms in the documents using the porter stemmer algorithm.
+ */
 public class PorterStemmer {
 
     // a single consonant
@@ -46,17 +51,11 @@ public class PorterStemmer {
     //matches if a token contains a vowel
     private static final Pattern containsVowel = Pattern.compile(v);
 
-    public static void main(String[] args) {
-        //use for testing
-        System.out.println(processToken("rational"));
-//        processToken("universe");
-        
-//        String term = "what 'the' fuck";
-//        Pattern p = Pattern.compile("([\'])(\\1)");
-//        if(p.matcher(term).find())
-//            System.out.println("done");
-    }
-
+    /**
+     *
+     * @param token
+     * @return
+     */
     public static String processToken(String token) {
         //System.out.println("token : " + token);
         if (token.length() < 3) {
@@ -237,6 +236,13 @@ public class PorterStemmer {
         return token;
     }
 
+    /**
+     * Helper function for step2 of the porter stemmer, checks if any of the 
+     * pattern of step2 matches
+     * 
+     * @param ruleNo
+     * @return
+     */
     public static String[] step2Helper(int ruleNo) {
         String[][] step2pairs = {new String[]{"ational", "ate"},
         new String[]{"tional", "tion"},
@@ -261,6 +267,13 @@ public class PorterStemmer {
         return step2pairs[ruleNo];
     }
 
+    /**
+     * Helper function for step3 of the porter stemmer, checks if any of the 
+     * pattern of step3 matches
+     * 
+     * @param ruleNo
+     * @return
+     */
     public static String[] step3Helper(int ruleNo) {
         String[][] step3pairs = {new String[]{"icate", "ic"},
         new String[]{"ative", ""},
@@ -272,6 +285,13 @@ public class PorterStemmer {
         return step3pairs[ruleNo];
     }
 
+    /**
+     * Helper function for step4 of the porter stemmer, checks if any of the 
+     * pattern of step4 matches
+     * 
+     * @param ruleNo 
+     * @return 
+     */
     public static String step4Helper(int ruleNo) {
         String[] step4pairs = {"al", "ance", "ence", "er", "ic", "able", "ible",
             "ant", "ement", "ment", "ent", "ion", "ou", "ism",

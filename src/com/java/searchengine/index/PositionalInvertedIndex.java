@@ -1,4 +1,9 @@
+package com.java.searchengine.index;
 
+
+import com.java.searchengine.main.IndexBuilderFactory;
+import com.java.searchengine.datastructure.PositionalPostingsStructure;
+import com.java.searchengine.util.SearchEngineUtilities;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Comparator;
@@ -9,57 +14,56 @@ import java.util.Map;
 import java.util.Map.Entry;
 import java.util.TreeMap;
 
-/*
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
- */
 /**
- *
- * @author vipinsharma
+ * Creates and manages the positional inverted index for all the text files 
+ * in a folder selected by the user
+ * 
  */
 public class PositionalInvertedIndex {
-
+    //HashMap containing the positional inverted index
     private HashMap<String, List<PositionalPostingsStructure>> pIndex;
 
-    //Variables for calculation of Index Statistics
+    //Variables to save Index Statistics
     private HashSet<String> typeSet;
     private int numOfTerms = 0;
     private int numOfTypes = 0;
     private HashMap<String, Integer> averagePostings;
     private double[] documentProportion;
     private long totalMemoryRequirement = 0;
+    Map<String, Integer> averagePostingsTree;
 
+    /**
+     * Class attributes are being initialized
+     */
     public PositionalInvertedIndex() {
-        pIndex = new HashMap<String, List<PositionalPostingsStructure>>();
+        pIndex = new HashMap<>();
         typeSet = new HashSet<>();
         averagePostings = new HashMap<>();
         documentProportion = new double[10];
     }
 
+    /**
+     * Adds all the types to the set typeSet
+     * 
+     * @param term
+     */
     public void addType(String term) {
         typeSet.add(term);
     }
 
+    /**
+     * Adds a term to the positional inverted index. 
+     * Checks for the following three conditions
+     * 1. New term is being added
+     * 2. Term already present but new document being indexed
+     * 3. Term and document id are present, new positional information is being
+     *    added
+     * 
+     * @param term
+     * @param documentId
+     * @param position
+     */
     public void addTerm(String term, int documentId, int position) {
-        List<Integer> positionList = new ArrayList<>();
-        HashMap<Integer, List<Integer>> docIdMap = new HashMap<Integer, List<Integer>>();
-//        if(pIndex.containsKey(term)){
-//            docIdMap = pIndex.get(term);
-//            if(docIdMap.containsKey(documentId)){
-//                positionList = docIdMap.get(documentId);
-//                positionList.add(position);
-//            }
-//            else{
-//                positionList.add(position);
-//                docIdMap.put(documentId,positionList);
-//            }
-//        }
-//        else{
-//            positionList.add(position);
-//            docIdMap.put(documentId,positionList);
-//            pIndex.put(term, docIdMap);
-//        }
         if (pIndex.containsKey(term)) {
             List<PositionalPostingsStructure> termPostingsList
                     = pIndex.get(term);
@@ -74,7 +78,7 @@ public class PositionalInvertedIndex {
             }
         } else {
             List<PositionalPostingsStructure> termPostingsList
-                    = new ArrayList<PositionalPostingsStructure>();
+                    = new ArrayList<>();
             PositionalPostingsStructure termPostings
                     = new PositionalPostingsStructure(documentId, position);
             termPostingsList.add(termPostings);
@@ -82,10 +86,19 @@ public class PositionalInvertedIndex {
         }
     }
 
+    /**
+     * Get postings list for a particular term
+     * 
+     * @param term
+     * @return
+     */
     public List<PositionalPostingsStructure> getPostings(String term) {
         return pIndex.get(term);
     }
 
+    /**
+     * Prints the whole positional inverted index on console
+     */
     public void printResults() {
         int longestTerm = 0;
         String[] termsArray = pIndex.keySet().toArray(
@@ -97,26 +110,9 @@ public class PositionalInvertedIndex {
 
         for (String term : termsArray) {
             System.out.print("\n" + term);
-            printSpaces(longestTerm - term.length());
+            SearchEngineUtilities.printSpaces(longestTerm - term.length());
             int longestTermTemp = 0;
-            //System.out.print(":");
-
-//            HashMap<Integer,List<Integer>> docIdMap = pIndex.get(term);
-//            Integer[] docIdArray = docIdMap.keySet().toArray(new Integer[docIdMap.keySet().size()]);
-//            Arrays.sort(docIdArray);
-//            
-//            for(Integer docId : docIdArray){
-//                List<Integer> posIndexes = docIdMap.get(docId);
-//                System.out.print(" : "+fileNames.get(docId) + " -> ");
-//                for(Integer posIndex : posIndexes){
-//                    System.out.print(posIndex + " , ");
-//                }
-//                System.out.println();
-//                printSpaces(longestTerm);
-//                //System.out.print(":");
-//            }
-//            for(Integer docIndex : pIndex.get(term).keySet())
-//                System.out.print("  "+fileNames.get(docIndex));
+            
             for (PositionalPostingsStructure posStructure : pIndex.get(term)) {
                 posStructure.printData(longestTermTemp);
                 System.out.print("\n");
@@ -125,13 +121,14 @@ public class PositionalInvertedIndex {
         }
     }
 
-    // prints a bunch of spaces
-    private static void printSpaces(int spaces) {
-        for (int i = 0; i < spaces; i++) {
-            System.out.print(" ");
-        }
-    }
-
+    /**
+     * Calculate index metrics for the positional inverted index.
+     * Following metrics are being calculated
+     * 1. Number of terms and types
+     * 2. Average postings for each term
+     * 3. Top 10 most frequent terms and the proportion of documents
+     * 4. Memory required to store the positional inverted index
+     */
     public void calculateMetrics() {
         numOfTerms = pIndex.keySet().size();
         numOfTypes = typeSet.size();
@@ -143,9 +140,6 @@ public class PositionalInvertedIndex {
         long termMemory = 0;
         long postingListMemory = 0;
         long postingsMemory = 0;
-
-        IndexBuilderFactory indexBuilderFactory = IndexBuilderFactory.getInstance();
-        int numOfDocsIndexed = indexBuilderFactory.fileNamesHashSet().size();
 
         HashMap<String, Integer> totalPostings = new HashMap<>();
 
@@ -180,31 +174,39 @@ public class PositionalInvertedIndex {
             }
         };
 
-        Map<String, Integer> averagePostingsTree = new TreeMap<String, Integer>(valueComparator);
+        averagePostingsTree = new TreeMap<>(valueComparator);
 
         averagePostingsTree.putAll(totalPostings);
+    }
 
-        //calculating the proportion of documents that contain 10 most frequent terms
+    /**
+     * Prints the positional index metrics
+     */
+    public void printMetrics() {
+        IndexBuilderFactory indexBuilderFactory = IndexBuilderFactory.getInstance();
+        int numOfDocsIndexed = indexBuilderFactory.fileNamesHashSet().size();
+        
+        System.out.println("\n\n----Index Statistics----");
+        System.out.println("\nNumber of types : " + numOfTypes);
+        System.out.println("\nNumber of terms : " + numOfTerms);
+        System.out.println("\nMost frequent terms : ");
         int count = 0;
 
         for (Entry<String, Integer> e : averagePostingsTree.entrySet()) {
             if (count == 10) {
                 break;
             }
-            System.out.println(e.getKey() + ": " + e.getValue() + " : " + indexBuilderFactory.searchTerm(e.getKey()).size()
-                    + " : " + numOfDocsIndexed);
-            documentProportion[count] = (double) (indexBuilderFactory.searchTerm(e.getKey()).size()) / numOfDocsIndexed;
+            documentProportion[count] = (double) 
+                    (indexBuilderFactory.searchTerm(e.getKey()).size()) / 
+                    numOfDocsIndexed;
+            
+            System.out.println("\t" + (count+1) + ":  " + e.getKey() + " : " + 
+                    indexBuilderFactory.searchTerm(e.getKey()).size() + 
+                    " : " + documentProportion[count]);
+            
             count++;
         }
-
-        for (double proportion : documentProportion) {
-            System.out.println("Proportion : " + proportion);
-        }
-
-        System.out.println("totalMemoryRequirement : " + ((double) totalMemoryRequirement / (1024 * 1024)) + " MB");
-    }
-
-    public void printMetrics() {
-        System.out.println("Term count : " + pIndex.keySet().size() + " : Type count : " + typeSet.size());
+        
+        System.out.println("\nTotal Memory Requirement : " + ((double) totalMemoryRequirement / (1024 * 1024)) + " MB");
     }
 }

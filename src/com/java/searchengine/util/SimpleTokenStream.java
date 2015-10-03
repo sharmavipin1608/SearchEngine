@@ -1,3 +1,5 @@
+package com.java.searchengine.util;
+
 import java.io.*;
 import java.util.*;
 
@@ -11,6 +13,8 @@ public class SimpleTokenStream implements TokenStream {
 
    /**
    Constructs a SimpleTokenStream to read from the specified file.
+     * @param fileToOpen
+     * @throws java.io.FileNotFoundException
    */
    public SimpleTokenStream(File fileToOpen) throws FileNotFoundException {
       mReader = new Scanner(new FileReader(fileToOpen));
@@ -18,6 +22,7 @@ public class SimpleTokenStream implements TokenStream {
    
    /**
    Constructs a SimpleTokenStream to read from a String of text.
+     * @param text
    */
    public SimpleTokenStream(String text) {
       mReader = new Scanner(text);
@@ -25,6 +30,7 @@ public class SimpleTokenStream implements TokenStream {
 
    /**
    Returns true if the stream has tokens remaining.
+     * @return 
    */
    @Override
    public boolean hasNextToken() {
@@ -34,6 +40,7 @@ public class SimpleTokenStream implements TokenStream {
    /**
    Returns the next token from the stream, or null if there is no token
    available.
+     * @return 
    */
    @Override
    public String nextToken() {

@@ -1,12 +1,25 @@
+package com.java.searchengine.main;
 
+
+import com.java.searchengine.index.NaiveInvertedIndex;
+import com.java.searchengine.index.PositionalInvertedIndex;
+import com.java.searchengine.datastructure.PositionalPostingsStructure;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Scanner;
 
+/**
+ *
+ * @author vipinsharma
+ */
 public class SimpleEngine {
 
+    /**
+     *
+     * @param args
+     */
     public static void main(String[] args){
         
         final Path currentWorkingPath = Paths.get("").toAbsolutePath();

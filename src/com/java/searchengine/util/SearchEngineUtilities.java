@@ -1,39 +1,37 @@
+package com.java.searchengine.util;
 
+import com.java.searchengine.datastructure.PositionalPostingsStructure;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
-import java.util.Set;
-
-/*
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
- */
 
 /**
- *
- * @author vipinsharma
+ * Utility file for search engine application
  */
 public class SearchEngineUtilities {
 
+    /**
+     * Prints spaces to format the output
+     * @param spaces Number of spaces to be printed
+     */
     public static void printSpaces(int spaces) {
         for (int i = 0; i < spaces; i++) {
             System.out.print(" ");
         }
     }
-    
-//    public static String hyphenation(String input) {
-//        input = input.replaceAll("-", "hyphen");
-//        input = input.replaceAll("\\W", "");
-//        input = input.replaceAll("hyphen", "-");
-//        input = input.toLowerCase();
-//        return input;
-//    }
-    
+      
+    /**
+     * Performs positional search while searching for the phrase in positional 
+     * inverted index.
+     * 
+     * @param list1 Postings list for term 1
+     * @param list2 Postings list for term 2
+     * @return list of postings after performing positional search on 2 terms
+     */
+        
     public static List<PositionalPostingsStructure> positionalSearch(
         List<PositionalPostingsStructure> list1, List<PositionalPostingsStructure> list2){
         int pointer1 = 0, pointer2 = 0;
-        //int docId1 = -1, docId2 = -1;
         List<PositionalPostingsStructure> resultList = 
                 new ArrayList<>();
         
@@ -61,19 +59,28 @@ public class SearchEngineUtilities {
         return resultList;
     }
     
+    /**
+     * Compares 2 lists to search list2 for the presence of a number 1 greater than
+     * number in list1
+     * 
+     * @param list1 list of postings in a particular document
+     * @param list2 list of postings in a particular document
+     * @return 
+     */
     public static boolean compareList(List<Integer> list1, List<Integer> list2){
         int pointer1 = 0, pointer2 = 0;
         
         while(true){
             int position1 = list1.get(pointer1);
             int position2 = list2.get(pointer2);
+
             if(position2 == position1+1){
                 return true;
             }
             else if(position2 > position1+1){
                 pointer1++;
             }
-            else if(position2 < position1){
+            else if(position2 < position1+1){
                 pointer2++;
             }
             
@@ -83,6 +90,12 @@ public class SearchEngineUtilities {
         return false;
     }
     
+    /**
+     * Returns a set of document id from postings list
+     * 
+     * @param list
+     * @return hash set of document id
+     */
     public static HashSet<Integer> convertListToSet(List<PositionalPostingsStructure> list){
         if(list != null){
             HashSet<Integer> documentSet = new HashSet<Integer>();

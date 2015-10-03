@@ -1,14 +1,28 @@
+package com.java.searchengine.index;
+
 
 import java.util.*;
 
+/**
+ *
+ * @author vipinsharma
+ */
 public class NaiveInvertedIndex {
 
     private HashMap<String, List<Integer>> mIndex;
 
+    /**
+     *
+     */
     public NaiveInvertedIndex() {
         mIndex = new HashMap<String, List<Integer>>();
     }
 
+    /**
+     *
+     * @param term
+     * @param documentID
+     */
     public void addTerm(String term, int documentID) {
         // TO-DO: add the term to the index hashtable. If the table does not have
         // an entry for the term, initialize a new ArrayList<Integer>, add the 
@@ -30,18 +44,31 @@ public class NaiveInvertedIndex {
         }
     }
 
+    /**
+     *
+     * @param term
+     * @return
+     */
     public List<Integer> getPostings(String term) {
         // TO-DO: return the postings list for the given term from the index map.
         List<Integer> docIdList = mIndex.get(term);
         return docIdList;
     }
 
+    /**
+     *
+     * @return
+     */
     public int getTermCount() {
       // TO-DO: return the number of terms in the index.
         int termCount = mIndex.keySet().size();
         return termCount;
     }
 
+    /**
+     *
+     * @return
+     */
     public String[] getDictionary() {
       // TO-DO: fill an array of Strings with all the keys from the hashtable.
         // Sort the array and return it.
